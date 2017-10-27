@@ -19,6 +19,7 @@ extern void forkret(void);
 extern void trapret(void);
 
 static void wakeup1(void *chan);
+static void wakeuppid(void *chan);
 
 void
 pinit(void)
@@ -203,9 +204,8 @@ exit(int st) // m
     }  
   }*/
   while(proc->cur_index > 0){
-    proc->cur_index--;
-		wakeup1(proc);
-	}
+    wakeuppid(proc);
+  }
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->parent == proc){
       p->parent = initproc;
@@ -296,7 +296,7 @@ waitpid(int pid, int *st, int op){
       else{
 //      p->pid_locker[p->cur_index]=proc->pid;
         p->cur_index++;
-				sleep(p, &ptable.lock);
+	sleep(p, &ptable.lock);
       }
     }
     if(!found || proc->killed){
@@ -501,6 +501,18 @@ wakeup1(void *chan)
     }
 }
 
+static void
+wakeuppid(void *chan)
+{
+  struct proc *p;
+  struct proc *pp;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if(p->state == SLEEPING && p->chan == chan){
+      p->state = RUNNABLE;
+      pp = (struct proc *) chan;
+      pp->cur_index--;
+    }
+}
 // Wake up all processes sleeping on chan.
 void
 wakeup(void *chan)
