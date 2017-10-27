@@ -202,9 +202,8 @@ exit(int st) // m
       }
     }  
   }*/
-  while(proc->cur_index > 0){
-    proc->cur_index--;
-		wakeup1(proc);
+  while(proc->cur_index > 0){ // as long as its not zero then it will wake up the processess.
+	wakeup1(proc);
 	}
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->parent == proc){
@@ -296,7 +295,7 @@ waitpid(int pid, int *st, int op){
       else{
 //      p->pid_locker[p->cur_index]=proc->pid;
         p->cur_index++;
-				sleep(p, &ptable.lock);
+	sleep(p, &ptable.lock);
       }
     }
     if(!found || proc->killed){
@@ -345,17 +344,17 @@ scheduler(void)
   {
     sti();
     struct proc *hp;
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    acquire(&ptable.lock);  // works by goind through the table then switches and then once it returns it goes through the timer interrupt
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) // find process currently running
     {
       if(p->state != RUNNABLE) continue;
       hp = p;
-      for(pp = ptable.proc; pp < &ptable.proc[NPROC]; pp++)
+      for(pp = ptable.proc; pp < &ptable.proc[NPROC]; pp++) // finds next runnable processes
       {
         if(pp->state != RUNNABLE) continue;
         if(hp->prio < pp->prio) hp = pp;
       }
-      p = hp;
+      p = hp; // switches the two process.
       proc = p;
       switchuvm(p);
       p->state = RUNNING;
@@ -508,7 +507,7 @@ wakeup(void *chan)
   acquire(&ptable.lock);
   wakeup1(chan);
   release(&ptable.lock);
-}
+} 
 
 // Kill the process with the given pid.
 // Process won't exit until it returns
