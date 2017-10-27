@@ -193,15 +193,19 @@ exit(int st) // m
 
   // Pass abandoned children to init.
   proc->est = st;
-  while(proc->cur_index > 0){
+/*  while(proc->cur_index > 0){
     proc->cur_index--;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->pid == proc->pid_locker[proc->cur_index]){
-	wakeup1(p);
-	break;
+				wakeup1(p);
+				break;
       }
     }  
-  }
+  }*/
+  while(proc->cur_index > 0){
+    proc->cur_index--;
+		wakeup1(proc);
+	}
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->parent == proc){
       p->parent = initproc;
@@ -222,7 +226,6 @@ wait(int *st)
 {
   struct proc *p;
   int havekids, pid;
-
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for zombie children.
@@ -242,7 +245,7 @@ wait(int *st)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
-	if(st) *st = p->est;
+	      if(st) *st = p->est;
         release(&ptable.lock);
         return pid;
       }
@@ -281,13 +284,19 @@ waitpid(int pid, int *st, int op){
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
-	if(st) *st = p->est;
+	      if(st) *st = p->est;
         release(&ptable.lock);
         return pid;
       }
+      else if (p->state == UNUSED) {
+        if (st) *st = p->est;
+        release(&ptable.lock);
+        return(pid);
+	    }
       else{
-        p->pid_locker[p->cur_index]=proc->pid;
+//      p->pid_locker[p->cur_index]=proc->pid;
         p->cur_index++;
+				sleep(p, &ptable.lock);
       }
     }
     if(!found || proc->killed){
@@ -295,9 +304,8 @@ waitpid(int pid, int *st, int op){
       release(&ptable.lock);
       return -1;
     }
-
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
-    sleep(proc, &ptable.lock);  //DOC: wait-sleep
+      //DOC: wait-sleep
   }
 }
 //PAGEBREAK: 42
@@ -324,8 +332,8 @@ setprio(int prio)
       break;
     }
   }
+  sched();
   release(&ptable.lock);
-  yield();
 }
 
 void
@@ -487,10 +495,10 @@ static void
 wakeup1(void *chan)
 {
   struct proc *p;
-
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
+    if(p->state == SLEEPING && p->chan == chan){
       p->state = RUNNABLE;
+    }
 }
 
 // Wake up all processes sleeping on chan.

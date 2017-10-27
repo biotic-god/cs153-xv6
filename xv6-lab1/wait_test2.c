@@ -20,7 +20,7 @@ int main(void){
 		if (pid == 0){
 			int j = 0;
 			while(j++ < 1000);
-			if(getpid() == start+4) sleep(30);
+			if(getpid() == start+4) sleep(80);
 			printf(1,"pid = %d\n",getpid());
 			if(getpid() == start+8){
 				printf(1,"pid %d waiting for %d\n",start+8,start+4);

@@ -67,7 +67,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   int est;		       // Exit status
-  int pid_locker[50];   // For waitpid
+//  int pid_locker[50];   // For waitpid
   int cur_index;
   int prio;
 };
