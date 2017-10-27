@@ -498,7 +498,7 @@ sleep(void *chan, struct spinlock *lk)
 // Wake up all processes sleeping on chan.
 // The ptable lock must be held.
 static void
-wakeup1(void *chan)
+wakeup1(void *chan) // is used everywhere
 {
   struct proc *p;
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
