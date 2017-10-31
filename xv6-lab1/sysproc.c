@@ -14,7 +14,7 @@ sys_fork(void)
 
 // cs 153
 int
-sys_exit(void) // m
+sys_exit(void) // m for lab 1 of CS 153
 {
   int st;
   argint(0, &st);
@@ -23,7 +23,7 @@ sys_exit(void) // m
 }
 
 int
-sys_wait(void) // m
+sys_wait(void) // m for lab 1 of CS 153
 {
   int *st;
   argptr(0, (char **)&st, 8);
@@ -31,7 +31,7 @@ sys_wait(void) // m
 }
 
 int
-sys_waitpid() // m
+sys_waitpid() // m for lab 1 of CS 153
 {
   int *st;
   int pid;
@@ -41,7 +41,7 @@ sys_waitpid() // m
   argint(0, &op);
   return waitpid(pid, st, op);
 }
-int sys_setprio() // m
+int sys_setprio() // m  for lab 1 of CS 153
 {
   int prio;
   argint(0,&prio);

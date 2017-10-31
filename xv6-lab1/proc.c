@@ -45,7 +45,7 @@ allocproc(void)
   release(&ptable.lock);
   return 0;
 
-found:
+found: // For lab 1 for CS 153 to initalize the process
   p->prio = 1;
   p->cur_index = 0;
   p->state = EMBRYO;
@@ -167,8 +167,8 @@ fork(void)
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
 // cs 153
-void
-exit(int st) // m
+void 
+exit(int st) // m: changed for lab1 part 1 for CS 153
 {
   struct proc *p;
   int fd;
@@ -203,15 +203,15 @@ exit(int st) // m
       }
     }  
   }*/
-<<<<<<< HEAD
+//<<<<<<< HEAD
   while(proc->cur_index > 0){ // as long as its not zero then it will wake up the processess.
 	wakeup1(proc);
 	}
-=======
+//=======
   while(proc->cur_index > 0){
     wakeuppid(proc);
   }
->>>>>>> 84685cd3fe396736e3e76237c9d62687cb7d24cd
+//>>>>>>> 84685cd3fe396736e3e76237c9d62687cb7d24cd
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->parent == proc){
       p->parent = initproc;
@@ -228,7 +228,7 @@ exit(int st) // m
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
 int
-wait(int *st)
+wait(int *st) // changed for part 2 of lab 1 of CS 153
 {
   struct proc *p;
   int havekids, pid;
@@ -270,7 +270,7 @@ wait(int *st)
 }
 
 int
-waitpid(int pid, int *st, int op){
+waitpid(int pid, int *st, int op){ // Created for part 3 of lab 1 of CS 153
   struct proc *p;
   int found;
   acquire(&ptable.lock);
@@ -324,7 +324,7 @@ waitpid(int pid, int *st, int op){
 //      via swtch back to the scheduler.
 
 void
-setprio(int prio)
+setprio(int prio) // created for lab 1 section 2 of the lab for CS 153
 {
   struct proc * p;
   acquire(&ptable.lock);
@@ -343,7 +343,7 @@ setprio(int prio)
 }
 
 void
-scheduler(void)
+scheduler(void) // Altered for lab 1 section 2 for lab of CS 153
 {
   struct proc *p;
   struct proc *pp;
@@ -497,7 +497,7 @@ sleep(void *chan, struct spinlock *lk)
 //PAGEBREAK!
 // Wake up all processes sleeping on chan.
 // The ptable lock must be held.
-static void
+static void // Created for all part of lab 1 for CS 153
 wakeup1(void *chan) // is used everywhere
 {
   struct proc *p;
@@ -507,7 +507,7 @@ wakeup1(void *chan) // is used everywhere
     }
 }
 
-static void
+static void // Created for lab 1 section 1 part 2 of the lab for CS153
 wakeuppid(void *chan)
 {
   struct proc *p;

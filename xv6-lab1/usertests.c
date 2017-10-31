@@ -14,7 +14,7 @@ char *echoargv[] = { "echo", "ALL", "TESTS", "PASSED", 0 };
 int stdout = 1;
 
 // simple file system tests
-
+// Changed all  wait functions in this file for part 1 of lab 1 for CS153
 void
 opentest(void)
 {
@@ -246,7 +246,7 @@ pipe1(void)
       exit(1);
     }
     close(fds[0]);
-    wait(&st);
+    wait(&st);// changed for CS 153
   } else {
     printf(1, "fork() failed\n");
     exit(1);
@@ -294,8 +294,8 @@ preempt(void)
   kill(pid2);
   kill(pid3);
   printf(1, "wait... ");
-  wait(&st);
-  wait(&st);
+  wait(&st);// Changed for CS153
+  wait(&st); 
   wait(&st);
   printf(1, "preempt ok\n");
 }

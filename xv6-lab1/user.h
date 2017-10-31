@@ -3,10 +3,10 @@ struct stat;
 // system calls
 // cs 153
 int fork(void);
-int exit(int) __attribute__((noreturn)); //m
-int wait(int*); //m
-int waitpid(int, int*, int); //m
-int setprio(int) __attribute__((noreturn)); //m
+int exit(int) __attribute__((noreturn)); //m For lab 1 of CS 153
+int wait(int*); //m For lab 1 of CS 153
+int waitpid(int, int*, int); //m For lab 1 of CS 153
+int setprio(int) __attribute__((noreturn)); //m For lab 1 of CS 153
 int pipe(int*);
 int write(int, void*, int);
 int read(int, void*, int);

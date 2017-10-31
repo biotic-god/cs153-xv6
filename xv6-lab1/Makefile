@@ -170,8 +170,8 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
-	_wait_test1\
-	_wait_test2\
+	_wait_test1\ # For CS 153 lab 1: Our wait test
+	_wait_test2\ # for CS 153 lab 1: out waitpid test
 	_priority_test\
 
 fs.img: mkfs README $(UPROGS)
@@ -238,7 +238,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 # after running make dist, probably want to
 # rename it to rev0 or rev1 or so on and then
 # check in that version.
-
+# Changed to add our wait and waitpid test
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\

@@ -104,7 +104,7 @@ int             pipewrite(struct pipe*, char*, int);
 // proc.c
 // cs 153
 struct proc*    copyproc(struct proc*);
-void            exit(int); //m
+void            exit(int); //m For lab 1 of CS 153
 int             fork(void);
 int             growproc(int);
 int             kill(int);
@@ -114,11 +114,11 @@ void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
-int             wait(int*); //m
-int 		waitpid(int, int*, int); //m
+int             wait(int*); //m For lab 1 of CS 153
+int 		waitpid(int, int*, int); //m for lab 1 of CS 153
 void            wakeup(void*);
 void            yield(void);
-void            setprio(int); // m
+void            setprio(int); // m for lab 1 of CS 153
 
 // swtch.S
 void            swtch(struct context**, struct context*);

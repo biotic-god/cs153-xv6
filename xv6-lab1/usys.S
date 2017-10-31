@@ -9,8 +9,8 @@
     ret
 
 SYSCALL(fork)
-SYSCALL(exit)
-SYSCALL(wait)
+SYSCALL(exit) // For CS 153 lab 1
+SYSCALL(wait) // For CS 153 lab 1
 SYSCALL(pipe)
 SYSCALL(read)
 SYSCALL(write)
@@ -29,5 +29,5 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
-SYSCALL(waitpid)
-SYSCALL(setprio)
+SYSCALL(waitpid) // For CS 153 Lab 1
+SYSCALL(setprio) // For CS 153 lab 1
