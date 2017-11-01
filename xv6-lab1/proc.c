@@ -323,6 +323,19 @@ waitpid(int pid, int *st, int op){ // Created for part 3 of lab 1 of CS 153
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
 
+/*
+void
+setprio (int priority) {
+  if(priority > 63)
+    proc->prio = 63;
+  else if(priority < 0)
+    proc->prio = 0;
+  else
+    proc->prio = priority;
+  proc->state = RUNNABLE;
+}
+*/
+
 void
 setprio(int prio) // created for lab 1 section 2 of the lab for CS 153
 {
@@ -340,8 +353,8 @@ setprio(int prio) // created for lab 1 section 2 of the lab for CS 153
   }
   sched();
   release(&ptable.lock);
+  
 }
-
 void
 scheduler(void) // Altered for lab 1 section 2 for lab of CS 153
 {

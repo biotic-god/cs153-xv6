@@ -170,9 +170,10 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
-	_wait_test1\ # For CS 153 lab 1: Our wait test
-	_wait_test2\ # for CS 153 lab 1: out waitpid test
+	_wait_test1\
+  _wait_test2\
 	_priority_test\
+	_lab1\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -242,7 +243,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
-	printf.c umalloc.c wait_test1.c wait_test2.c priority_test.c\
+	printf.c umalloc.c wait_test1.c wait_test2.c priority_test.c lab1.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 
