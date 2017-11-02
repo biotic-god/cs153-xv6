@@ -126,7 +126,7 @@ int waitPid(void){
 //		printf(1, "\n Hello! this is child# %d and I will change my priority to %d \n",getpid(),60-20*i);
 		setprio(20*i);	
 		int j;
-		while(j++ < 30000000);
+		while(j++ < 50000000);
 		printf(1, "\n child# %d with priority %d has finished! \n",getpid(),20*i);		
 		exit(0);
         }
