@@ -61,6 +61,7 @@ exec(char *path, char **argv)
   ip = 0;
 
   sz = PGROUNDUP(sz);
+	clearpteu(pgdir, (char*)sz);
 /*
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
@@ -69,12 +70,12 @@ exec(char *path, char **argv)
 */
 
 	// Allocate stack page from USERTOP
-	tstack = USEREND - PGSIZE;
+	tstack = USEREND - 2*PGSIZE;
     if((sp = allocuvm(pgdir, tstack, USEREND)) == 0){
-			panic("panic newsp failed");
+			panic("stack allocation failed");
 			goto bad;
 		}
-//  clearpteu(pgdir, (char*)tstack);
+  clearpteu(pgdir, (char*)(tstack+PGSIZE));
 
 
   // Push argument strings, prepare rest of stack in ustack.

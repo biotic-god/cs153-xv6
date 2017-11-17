@@ -1,0 +1,98 @@
+exec.c:  safestrcpy(curproc->name, last, sizeof(curproc->name));
+exec.c:  curproc->tstack = tstack; //stack address
+exec.c:  oldpgdir = curproc->pgdir;
+exec.c:  curproc->pgdir = pgdir;
+exec.c:  curproc->sz = sz;
+exec.c:  curproc->tf->eip = elf.entry;  // main
+exec.c:  curproc->tf->esp = sp;
+exec.c~:  safestrcpy(curproc->name, last, sizeof(curproc->name));
+exec.c~:  curproc->tstack = tstack; //stack address
+exec.c~:  oldpgdir = curproc->pgdir;
+exec.c~:  curproc->pgdir = pgdir;
+exec.c~:  curproc->sz = sz;
+exec.c~:  curproc->tf->eip = elf.entry;  // main
+exec.c~:  curproc->tf->esp = sp;
+proc.c:  sz = curproc->sz;
+proc.c:    if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
+proc.c:    if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
+proc.c:  curproc->sz = sz;
+proc.c:  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->tstack)) == 0){
+proc.c:	np->tstack = curproc->tstack;
+proc.c:  np->sz = curproc->sz;
+proc.c:  *np->tf = *curproc->tf;
+proc.c:    if(curproc->ofile[i])
+proc.c:      np->ofile[i] = filedup(curproc->ofile[i]);
+proc.c:  np->cwd = idup(curproc->cwd);
+proc.c:  safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+proc.c:    if(curproc->ofile[fd]){
+proc.c:      fileclose(curproc->ofile[fd]);
+proc.c:      curproc->ofile[fd] = 0;
+proc.c:  iput(curproc->cwd);
+proc.c:  curproc->cwd = 0;
+proc.c:  wakeup1(curproc->parent);
+proc.c:  curproc->state = ZOMBIE;
+proc.c:    if(!havekids || curproc->killed){
+proc.c~:  sz = curproc->sz;
+proc.c~:    if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
+proc.c~:    if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
+proc.c~:  curproc->sz = sz;
+proc.c~:  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->tstack)) == 0){
+proc.c~:	np->tstack = curproc->tstack;
+proc.c~:  np->sz = curproc->sz;
+proc.c~:  *np->tf = *curproc->tf;
+proc.c~:    if(curproc->ofile[i])
+proc.c~:      np->ofile[i] = filedup(curproc->ofile[i]);
+proc.c~:  np->cwd = idup(curproc->cwd);
+proc.c~:  safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+proc.c~:    if(curproc->ofile[fd]){
+proc.c~:      fileclose(curproc->ofile[fd]);
+proc.c~:      curproc->ofile[fd] = 0;
+proc.c~:  iput(curproc->cwd);
+proc.c~:  curproc->cwd = 0;
+proc.c~:  wakeup1(curproc->parent);
+proc.c~:  curproc->state = ZOMBIE;
+proc.c~:    if(!havekids || curproc->killed){
+syscall.c: 	if(addr >= curproc->tstack && addr+4 <= USEREND){
+syscall.c: 	else if(addr >= curproc->sz || addr+4 > curproc->sz)
+syscall.c:  if(addr >= curproc->tstack && addr+4 <= USEREND)
+syscall.c:  if(addr >= curproc->sz)
+syscall.c: 	if(i >= curproc->tstack && i+size <= USEREND)
+syscall.c:  if((uint)i >= curproc->sz || (uint)i+size > curproc->sz)
+syscall.c:  num = curproc->tf->eax;
+syscall.c:    curproc->tf->eax = syscalls[num]();
+syscall.c:            curproc->pid, curproc->name, num);
+syscall.c:    curproc->tf->eax = -1;
+syscall.c~: 	if(addr >= curproc->tstack && addr+4 <= USEREND){
+syscall.c~: 	else if(addr >= curproc->sz || addr+4 > curproc->sz)
+syscall.c~:  if(addr >= curproc->tstack && addr+4 <= USEREND)
+syscall.c~:  if(addr >= curproc->sz)
+syscall.c~: 	if(i >= curproc->tstack && i+size <= USEREND)
+syscall.c~:  if(size < 0 || (uint)i >= curproc->sz || (uint)i+size > curproc->sz)
+syscall.c~:  num = curproc->tf->eax;
+syscall.c~:    curproc->tf->eax = syscalls[num]();
+syscall.c~:            curproc->pid, curproc->name, num);
+syscall.c~:    curproc->tf->eax = -1;
+sysfile.c:    if(curproc->ofile[fd] == 0){
+sysfile.c:      curproc->ofile[fd] = f;
+sysfile.c:  iput(curproc->cwd);
+sysfile.c:  curproc->cwd = ip;
+trap.c:		if(curproc->tf->esp < curproc->tstack){
+trap.c:			uint rep = ((curproc->tstack - curproc->tf->esp)/KSTACKSIZE)+1;
+trap.c:			if(curproc->sz+2*KSTACKSIZE > curproc->tf->esp){
+trap.c:				cprintf("guard page error! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
+trap.c:				curproc->killed = 1;
+trap.c:			if(addstackpage(curproc->pgdir, curproc->tstack, rep) == 1) break;
+trap.c:      cprintf("allocation error! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
+trap.c:			curproc->killed = 1;
+trap.c:		curproc->killed = 1;
+trap.c~:		if(curproc->tf->esp < curproc->tstack){
+trap.c~:			uint rep = ((curproc->tstack - curproc->tf->esp)/KSTACKSIZE)+1;
+trap.c~:			if(curproc->sz+2*KSTACKSIZE > curproc->tf->esp){
+trap.c~:				cprintf("guard page error! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
+trap.c~:				curproc->killed = 1;
+trap.c~:			if(addstackpage(curproc->pgdir, curproc->tstack, rep) == 1) break;
+trap.c~:      cprintf("allocation error! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
+trap.c~:			curproc->killed = 1;
+trap.c~:		curproc->killed = 1;
+vm.c:  curproc->tstack = tstack;
+vm.c~:  curproc->tstack = tstack;
