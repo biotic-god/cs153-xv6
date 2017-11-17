@@ -18,7 +18,7 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;
   struct proc *curproc = myproc();
-  uint tstack = 0; //top of stack
+  uint tstack = 0; //top of stack For CS153 lab2 part1
   begin_op();
 
   if((ip = namei(path)) == 0){
@@ -69,7 +69,7 @@ exec(char *path, char **argv)
   sp = sz;
 */
 
-	// Allocate stack page from USERTOP
+	// Allocate stack page from USERTOP For CS153 lab2 part1
 	tstack = USEREND - 2*PGSIZE;
     if((sp = allocuvm(pgdir, tstack, USEREND)) == 0){
 			panic("stack allocation failed");
@@ -103,7 +103,7 @@ exec(char *path, char **argv)
       last = s+1;
   safestrcpy(curproc->name, last, sizeof(curproc->name));
 
-  // Commit to the user image.
+  // Commit to the user image. For CS153 lab2 part1
   curproc->tstack = tstack; //stack address
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;

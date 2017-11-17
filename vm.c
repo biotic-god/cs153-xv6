@@ -322,7 +322,7 @@ resetpteu(pde_t *pgdir, char *uva)
 // Given a parent process's page table, create a copy
 // of it for a child.
 pde_t*
-copyuvm(pde_t *pgdir, uint sz, uint tstack)
+copyuvm(pde_t *pgdir, uint sz, uint tstack)// FOR CS153 lab2 part1
 {
   pde_t *d;
   pte_t *pte;
@@ -345,7 +345,7 @@ copyuvm(pde_t *pgdir, uint sz, uint tstack)
       goto bad;
   }
 	//copy the stack
-  if (tstack == 0 || tstack >= USEREND) return d;
+  if (tstack == 0 || tstack >= USEREND) return d; // For CS153 lab2 part1
   for(i = tstack; i < USEREND; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 1)) == 0)
       panic("copyuvm: pte should exist");
@@ -406,7 +406,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   }
   return 0;
 }
-int
+int // For CS153 lab2 part1 
 addstackpage(pde_t *pgdir, uint tstack, uint rep)
 {
   pte_t *pte;

@@ -82,15 +82,15 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
 
-  case T_PGFLT:
-		if(curproc->tf->esp < curproc->tstack){
+  case T_PGFLT: // For CS153 lab2 part1
+		if(curproc->tf->esp < curproc->tstack){ // Check to see if stack size matches esp and if it doesn't it makes it the same
 			uint rep = ((curproc->tstack - curproc->tf->esp)/KSTACKSIZE)+1;
-			if(curproc->sz+2*KSTACKSIZE > curproc->tf->esp){
+			if(curproc->sz+2*KSTACKSIZE > curproc->tf->esp){ // Checks for the garbage so that if the esp reaches we delete until it is no longer there.
 				cprintf("guard page error! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
 				curproc->killed = 1;
 				break;
 			}
-			if(addstackpage(curproc->pgdir, curproc->tstack, rep) == 1) break;
+			if(addstackpage(curproc->pgdir, curproc->tstack, rep) == 1) break; // Checks if fails to allocate for the stack
       cprintf("allocation error! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
 			curproc->killed = 1;
 			break;
