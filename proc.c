@@ -130,8 +130,8 @@ userinit(void)
     panic("userinit: out of memory?");
   inituvm(p->pgdir, _binary_initcode_start, (int)_binary_initcode_size);
   p->sz = PGSIZE;
-  p->tstack = 0;
-  memset(p->tf, 0, sizeof(*p->tf));
+  p->tstack = 0;// For part1, lab2 cs 153
+  memset(p->tf, 0, sizeof(*p->tf)); 
   p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
   p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
   p->tf->es = p->tf->ds;
@@ -166,6 +166,7 @@ growproc(int n)
   if(n > 0){
     if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
+     if(sz + PGSIZE <= tstack) return -1;
   } else if(n < 0){
     if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
@@ -191,7 +192,7 @@ fork(void)
   }
 
   // Copy process state from proc.
-  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->tstack)) == 0){
+  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->tstack)) == 0){ //Changed the copyuvm for Lab2 part 1 in CS153
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;

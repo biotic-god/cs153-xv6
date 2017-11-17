@@ -18,7 +18,7 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;
   struct proc *curproc = myproc();
-  uint tstack = 0; //top of stack
+  uint tstack = 0; //top of stack for lab2 part1 for CS 153
   begin_op();
 
   if((ip = namei(path)) == 0){
@@ -61,6 +61,7 @@ exec(char *path, char **argv)
   ip = 0;
 
   sz = PGROUNDUP(sz);
+  clearpteu(pgdir, (char*)sz);
 /*
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
@@ -68,13 +69,13 @@ exec(char *path, char **argv)
   sp = sz;
 */
 
-	// Allocate stack page from USERTOP
-	tstack = USEREND - PGSIZE;
-    if((sp = allocuvm(pgdir, tstack, USEREND)) == 0){
+	// Allocate stack page from USERTOP for CS153 lab 2 part1
+	tstack = USEREND - PGSIZE;  // initialize the tstack
+    if((sp = allocuvm(pgdir, tstack, USEREND)) == 0){ // when the tstack cannot initialize
 			panic("stack allocation failed");
 			goto bad;
 		}
-//  clearpteu(pgdir, (char*)tstack);
+  clearpteu(pgdir, (char*)(tstack+PGSIZE));
 
 
   // Push argument strings, prepare rest of stack in ustack.

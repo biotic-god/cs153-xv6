@@ -18,7 +18,7 @@ int
 fetchint(uint addr, int *ip)
 {
 	struct proc *curproc = myproc();
- 	if(addr >= curproc->tstack && addr+4 <= USEREND){
+ 	if(addr >= curproc->tstack && addr+4 <= USEREND){ // For CS153 lab2 part1
 		goto exe;
 	}
  	else if(addr >= curproc->sz || addr+4 > curproc->sz)
@@ -36,7 +36,7 @@ fetchstr(uint addr, char **pp)
 {
   char *s, *ep;
   struct proc *curproc = myproc();
-  if(addr >= curproc->tstack && addr+4 <= USEREND)
+  if(addr >= curproc->tstack && addr+4 <= USEREND) // For CS153 lab2 part1
   	 goto exe;
   if(addr >= curproc->sz)
     return -1;
@@ -67,7 +67,7 @@ argptr(int n, char **pp, int size)
   struct proc *curproc = myproc();
   if(size < 0 || argint(n, &i) < 0)
     return -1;
- 	if(i >= curproc->tstack && i+size <= USEREND)
+ 	if(i >= curproc->tstack && i+size <= USEREND) //For CS153 lab2 part1
     	 goto exe;
   if((uint)i >= curproc->sz || (uint)i+size > curproc->sz)
     return -1;
