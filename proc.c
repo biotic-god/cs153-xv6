@@ -130,7 +130,7 @@ userinit(void)
     panic("userinit: out of memory?");
   inituvm(p->pgdir, _binary_initcode_start, (int)_binary_initcode_size);
   p->sz = PGSIZE;
-  p->tstack = 0;
+  p->tstack = 0; // For CS153 lab2 part 1
   memset(p->tf, 0, sizeof(*p->tf));
   p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
   p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
@@ -193,7 +193,7 @@ fork(void)
     return -1;
   }
 
-  // Copy process state from proc.
+  // Copy process state from proc. Changed the copyuvm for CS 153 lab2 part 1
   if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->tstack)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
