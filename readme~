@@ -1,0 +1,15 @@
+files modified:
+vm.c
+add function addstackpage, modify stack boundary, copy the stack in copyuvm
+proc.h
+add tstack
+exec.c
+stack relocation
+proc.c
+initialize and fork
+syscall.c
+modify stack boundary
+trap.c
+add page fault
+memlayout.h
+add USEREND
