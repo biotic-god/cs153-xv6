@@ -162,16 +162,16 @@ growproc(int n)
   uint sz;
   struct proc *curproc = myproc();
   sz = curproc->sz;
-  if(proc->tstack != 0)
+  if(curproc->tstack != 0)
    {
-	  if(sz +n >= proc->tstack-PGSIZE)
+	  if(sz +n >= curproc->tstack-PGSIZE)
 		  return -1;
    }
 	resetpteu(curproc->pgdir,(char *)sz);
   if(n > 0){
     if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
-		if(sz+PGSIZE<=tstack) return -1;
+		if(sz+PGSIZE<=curproc->tstack) return -1;
   } else if(n < 0){
     if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;

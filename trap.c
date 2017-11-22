@@ -105,7 +105,7 @@ trap(struct trapframe *tf)
 		}else if (curproc){ // kernel mode
 			cprintf("Stack Owerflow in proccess pid %d %s: trap %d err %d on cpu %d "
 						 "eip 0x%x addr 0x%x--kill proc\n",
-						  proc->pid, proc->name, tf->trapno, tf->err, cpu->id, tf->eip, 
+						  curproc->pid, curproc->name, tf->trapno, tf->err, cpuid(), tf->eip, 
 						  rcr2());                                          
 			curproc->killed = 1;
 			break;
