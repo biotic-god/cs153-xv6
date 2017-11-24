@@ -32,7 +32,7 @@ seginit(void)
 // Return the address of the PTE in page table pgdir
 // that corresponds to virtual address va.  If alloc!=0,
 // create any required page table pages.
-static pte_t *
+pte_t *
 walkpgdir(pde_t *pgdir, const void *va, int alloc)
 {
   pde_t *pde;
@@ -248,6 +248,25 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   return newsz;
 }
 
+int
+allocshm(pde_t *pgdir, char *frame)
+{
+	struct proc *curproc = myproc();
+	uint sz = PGROUNDUP(curproc->sz);
+  if(sz + 2*PGSIZE > curproc->tstack) return -1;
+	pte_t *pte;
+	pte = walkpgdir(pgdir, (void*) sz , 0);
+	while((*pte & PTE_P) && (sz + 2*PGSIZE <= curproc->tstack)){
+		sz+=PGSIZE;
+		pte = walkpgdir(pgdir, (void*) sz , 0);
+	}
+	if(sz + 2*PGSIZE > curproc->tstack) return -1;
+	if(mappages(pgdir, (void*) sz , PGSIZE, V2P(frame), PTE_W|PTE_U) < 0){
+		cprintf("allocuvm out of memory\n");
+		return -1;
+	}
+	return sz;
+}
 // Deallocate user pages to bring the process size from oldsz to
 // newsz.  oldsz and newsz need not be page-aligned, nor does newsz
 // need to be less than oldsz.  oldsz can be larger than the actual

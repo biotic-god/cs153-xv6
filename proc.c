@@ -121,6 +121,7 @@ void
 userinit(void)
 {
   struct proc *p;
+	int page_id;
   extern char _binary_initcode_start[], _binary_initcode_size[];
 
   p = allocproc();
@@ -139,7 +140,10 @@ userinit(void)
   p->tf->eflags = FL_IF;
   p->tf->esp = PGSIZE;
   p->tf->eip = 0;  // beginning of initcode.S
-
+	for(page_id = 0; page_id < MAXPPP; page_id++){
+		p->pages[page_id].id = -1;
+		p->pages[page_id].vaddr = 0;
+	}
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 

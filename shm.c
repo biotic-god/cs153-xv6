@@ -28,22 +28,128 @@ void shminit() {
   release(&(shm_table.lock));
 }
 
+int shm_create(int table_id) {
+	int page_id;
+	char* memory;
+	struct proc *curproc = myproc();
+	if(table_id < 0 || table_id >= 64){
+		cprintf("Proc: %d, invalid id\n",curproc->pid);
+		return -1;
+	}
+	for(page_id = 0; page_id < MAXPPP; page_id++)
+		if(curproc->pages[page_id].id == -1) break;
+	if(page_id == MAXPPP){
+		cprintf("Proc: %d, process is full\n",curproc->pid);
+		return -1;
+	}
+	acquire(&(shm_table.lock));
+	if(shm_table.shm_pages[table_id].refcnt != 0){
+		cprintf("Proc: %d, id %d already exits\n",curproc->pid, table_id);
+		release(&(shm_table.lock));
+		return -1;
+	}
+	if((memory = kalloc())==0){
+		cprintf("Proc: %d, allocation error\n",curproc->pid);
+		release(&(shm_table.lock));
+		return -1;
+	}
+	shm_table.shm_pages[table_id].id = table_id;
+	shm_table.shm_pages[table_id].refcnt++;
+	memset(memory, 0, PGSIZE);
+	shm_table.shm_pages[table_id].frame = memory;
+	release(&(shm_table.lock));
+	curproc->pages[page_id].id = table_id;
+	return page_id;
+}
 int shm_open(int id, char **pointer) {
-
-//you write this
-
-
-
-
-return 0; //added to remove compiler warning -- you should decide what to return
+	int page_id = -1;
+	uint address;
+	struct proc *curproc = myproc();
+	if(id < 0 || id >= 64){
+		cprintf("Proc: %d, invalid id\n",curproc->pid);
+		return -1;
+	}
+	acquire(&(shm_table.lock));
+	if (shm_table.shm_pages[id].refcnt == 0){
+		release(&(shm_table.lock));
+		cprintf("Proc: %d, id %d is not created\n",curproc->pid, id);
+		if((page_id = shm_create(id))==-1){
+			cprintf("Proc: %d, id %d cannot be created\n",curproc->pid, id);
+			return -1;
+		}
+		acquire(&(shm_table.lock));
+	}
+	if(page_id == -1){
+		for(page_id = 0; page_id < MAXPPP; page_id++)  
+			if(curproc->pages[page_id].id  == id) break;
+		if(page_id == MAXPPP){
+			for(page_id = 0; page_id < MAXPPP; page_id++)  
+				if(curproc->pages[page_id].id == -1) break;
+			if(page_id == MAXPPP){
+      	release(&(shm_table.lock));
+      	cprintf("Proc: %d, process is full\n",curproc->pid);
+				return -1; 
+    	}
+			curproc->pages[page_id].id = id;
+			curproc->pages[page_id].vaddr = 0;
+			shm_table.shm_pages[id].refcnt++;
+  	} 
+	}
+	if(curproc->pages[page_id].vaddr == 0){
+    if((address = allocshm(curproc->pgdir,shm_table.shm_pages[id].frame)) == -1){
+			release(&(shm_table.lock));
+			cprintf("Proc: %d, allocshm error\n",curproc->pid);
+			return -1;
+		}
+		curproc->pages[page_id].vaddr = (char*) address;
+  }
+	release(&(shm_table.lock));
+	*pointer = curproc->pages[page_id].vaddr;
+	return 0;
 }
 
 
 int shm_close(int id) {
-//you write this too!
-
-
-
-
-return 0; //added to remove compiler warning -- you should decide what to return
+	int page_id;
+	pte_t *pte;
+	struct proc *curproc = myproc();
+	if(id < 0 || id >= 64){
+		cprintf("Proc: %d, invalid id\n",curproc->pid);
+		return -1;
+	}
+  for(page_id = 0; page_id < MAXPPP; page_id++)
+		if(curproc->pages[page_id].id == id) break;
+	if (page_id == MAXPPP){
+		cprintf("Proc: %d, not held by current process\n",curproc->pid);
+		return -1;
+	}
+	acquire(&(shm_table.lock));
+	if(shm_table.shm_pages[id].refcnt <= 0){
+		release(&(shm_table.lock));
+		cprintf("Proc: %d, empty entry in table\n",curproc->pid);
+		return 0;
+	}
+	shm_table.shm_pages[id].refcnt--;
+	pte = walkpgdir(curproc->pgdir, shm_table.shm_pages[id].frame, 0);
+	if(pte == 0){
+		cprintf("Proc: %d, free memory error 1\n",curproc->pid);
+		release(&(shm_table.lock));
+		return 0;
+	}
+	if(shm_table.shm_pages[id].refcnt == 0){
+		shm_table.shm_pages[id].id =0;
+		if((*pte & PTE_P) == 0){
+			cprintf("Proc: %d, free memory error 2\n",curproc->pid);
+			shm_table.shm_pages[id].frame =0;
+			release(&(shm_table.lock));
+			return 0;
+		}
+		kfree(P2V(PTE_ADDR(*pte)));
+		shm_table.shm_pages[id].frame =0;
+	}
+	*pte = 0;
+	release(&(shm_table.lock));
+	curproc->pages[page_id].id = -1;
+	curproc->pages[page_id].vaddr = 0;
+	return 0;
 }

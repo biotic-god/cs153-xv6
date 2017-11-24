@@ -248,6 +248,25 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   return newsz;
 }
 
+int
+allocshm(pde_t *pgdir, char *frame)
+{
+	struct proc *curproc = myproc();
+	uint sz = PGROUNDUP(curproc->sz);
+  if(sz + 2*PGSIZE > curproc->tstack) return -1;
+	pte_t *pte;
+	pte = walkpgdir(pgdir, (void*) sz , 0);
+	while((*pte & PTE_P) && (sz + 2*PGSIZE <= curproc->tstack)){
+		sz+=PGSIZE;
+		pte = walkpgdir(pgdir, (void*) sz , 0);
+	}
+	if(sz + 2*PGSIZE > curproc->tstack) return -1;
+	if(mappages(pgdir, (void*) sz , PGSIZE, V2P(frame), PTE_W|PTE_U) < 0){
+		cprintf("allocuvm out of memory\n");
+		return -1;
+	}
+	return sz;
+}
 // Deallocate user pages to bring the process size from oldsz to
 // newsz.  oldsz and newsz need not be page-aligned, nor does newsz
 // need to be less than oldsz.  oldsz can be larger than the actual
@@ -314,7 +333,6 @@ void
 resetpteu(pde_t *pgdir, char *uva)
 {
   pte_t *pte;
-
   pte = walkpgdir(pgdir, uva, 0);
   if(pte == 0)
     panic("clearpteu");
@@ -323,7 +341,7 @@ resetpteu(pde_t *pgdir, char *uva)
 // Given a parent process's page table, create a copy
 // of it for a child.
 pde_t*
-copyuvm(pde_t *pgdir, uint sz, uint tstack)
+copyuvm(pde_t *pgdir, uint sz, uint tstack)// FOR CS153 lab2 part1
 {
   pde_t *d;
   pte_t *pte;
@@ -346,7 +364,7 @@ copyuvm(pde_t *pgdir, uint sz, uint tstack)
       goto bad;
   }
 	//copy the stack
-  if (tstack == 0 || tstack >= USEREND) return d;
+  if (tstack == 0 || tstack >= USEREND) return d; // For CS153 lab2 part1
   for(i = tstack; i < USEREND; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void *) i, 1)) == 0)
       panic("copyuvm: pte should exist");
@@ -407,7 +425,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   }
   return 0;
 }
-int
+int // For CS153 lab2 part1 
 addstackpage(pde_t *pgdir, uint tstack, uint rep)
 {
   pte_t *pte;

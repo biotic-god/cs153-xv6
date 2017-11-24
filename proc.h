@@ -35,6 +35,10 @@ struct context {
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
+struct page_info {
+  int id;
+  char* vaddr;
+};
 struct proc {
   uint sz;                     // Size of process memory (bytes)
   pde_t* pgdir;                // Page table
@@ -50,6 +54,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 	uint tstack;								 // stack begins For CS153 lab2 part1
+	struct page_info pages[MAXPPP];
 };
 
 // Process memory is laid out contiguously, low addresses first:
