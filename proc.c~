@@ -111,7 +111,10 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-
+	for(page_id = 0; page_id < MAXPPP; page_id++){
+		p->pages[page_id].id = -1;
+		p->pages[page_id].vaddr = 0;
+	}
   return p;
 }
 
@@ -121,6 +124,7 @@ void
 userinit(void)
 {
   struct proc *p;
+	int page_id;
   extern char _binary_initcode_start[], _binary_initcode_size[];
 
   p = allocproc();
@@ -139,7 +143,7 @@ userinit(void)
   p->tf->eflags = FL_IF;
   p->tf->esp = PGSIZE;
   p->tf->eip = 0;  // beginning of initcode.S
-	for(int page_id = 0; page_id < MAXPPP; page_id++){
+	for(page_id = 0; page_id < MAXPPP; page_id++){
 		p->pages[page_id].id = -1;
 		p->pages[page_id].vaddr = 0;
 	}
@@ -185,6 +189,18 @@ growproc(int n)
   return 0;
 }
 
+int
+growstack(void)
+{
+	struct proc *curproc = myproc();
+  uint hp;
+	hp = curproc->tstack-PGSIZE;
+  if(hp < curproc->sz+PGSIZE) return -1;
+  if((hp = allocuvm(curproc->pgdir, hp, hp + PGSIZE)) == 0) return -1;
+  curproc->tstack = hp - PGSIZE;
+  switchuvm(curproc);
+  return 0;
+}
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
@@ -271,7 +287,9 @@ exit(void)
         wakeup1(initproc);
     }
   }
-
+	for(page_id = 0; page_id < MAXPPP; page_id++){
+		if(p->pages[page_id].id != -1) shm_close(p->pages[page_id].id);
+	}
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
   sched();
