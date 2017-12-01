@@ -61,7 +61,7 @@ exec(char *path, char **argv)
   ip = 0;
 
   sz = PGROUNDUP(sz);
-	clearpteu(pgdir, (char*)sz);
+//	clearpteu(pgdir, (char*)sz);
 /*
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
@@ -75,9 +75,8 @@ exec(char *path, char **argv)
 			panic("stack allocation failed");
 			goto bad;
 		}
-  clearpteu(pgdir, (char*)(tstack+PGSIZE));
-
-
+		sp = tstack+PGSIZE;
+	  clearpteu(pgdir, (char*)(tstack+PGSIZE));
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
@@ -87,6 +86,7 @@ exec(char *path, char **argv)
       goto bad;
     ustack[3+argc] = sp;
   }
+
   ustack[3+argc] = 0;
 
   ustack[0] = 0xffffffff;  // fake return PC
@@ -112,6 +112,7 @@ exec(char *path, char **argv)
   curproc->tf->esp = sp;
   switchuvm(curproc);
   freevm(oldpgdir);
+	
   return 0;
 
  bad:

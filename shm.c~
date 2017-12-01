@@ -130,7 +130,7 @@ int shm_close(int id) {
 		return 0;
 	}
 	shm_table.shm_pages[id].refcnt--;
-	pte = walkpgdir(curproc->pgdir, shm_table.shm_pages[id].frame, 1);
+	pte = walkpgdir(curproc->pgdir, shm_table.shm_pages[id].frame, 0);
 	if(pte == 0){
 		cprintf("Proc: %d, free memory error 1\n",curproc->pid);
 		release(&(shm_table.lock));

@@ -110,6 +110,7 @@ int shm_open(int id, char **pointer) {
 
 
 int shm_close(int id) {
+	cprintf("****************");
 	int page_id;
 	pte_t *pte;
 	struct proc *curproc = myproc();
