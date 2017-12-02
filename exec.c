@@ -28,7 +28,7 @@ exec(char *path, char **argv)
   }
   ilock(ip);
   pgdir = 0;
-
+	cprintf("exec called by proc pid %d \n", curproc->pid);
   // Check ELF header
   if(readi(ip, (char*)&elf, 0, sizeof(elf)) != sizeof(elf))
     goto bad;
@@ -61,7 +61,7 @@ exec(char *path, char **argv)
   ip = 0;
 
   sz = PGROUNDUP(sz);
-//	clearpteu(pgdir, (char*)sz);
+	clearpteu(pgdir, (char*)sz);
 /*
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
@@ -71,12 +71,14 @@ exec(char *path, char **argv)
 
 	// Allocate stack page from USERTOP For CS153 lab2 part1
 	tstack = USEREND - 2*PGSIZE;
-    if((sp = allocuvm(pgdir, tstack, USEREND)) == 0){
-			panic("stack allocation failed");
-			goto bad;
-		}
-		sp = tstack+PGSIZE;
-	  clearpteu(pgdir, (char*)(tstack+PGSIZE));
+  if((sp = allocuvm(pgdir, tstack, USEREND)) == 0){
+		panic("stack allocation failed");
+		goto bad;
+	}
+	sp = tstack+PGSIZE;
+  clearpteu(pgdir, (char*)(tstack+PGSIZE));
+
+	cprintf("stack begins at addr %x \n", sp);
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)

@@ -63,18 +63,15 @@ runcmd(struct cmd *cmd)
   struct listcmd *lcmd;
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
-
-  if(cmd == 0){
-    printf(1,"%d\n", cmd->type);exit();}
+	printf(1, "cmd: %d\n", cmd);
+  if(cmd == 0)
+    exit();
 
   switch(cmd->type){
-	
   default:
-		
     panic("runcmd");
 
   case EXEC:
-		
     ecmd = (struct execcmd*)cmd;
     if(ecmd->argv[0] == 0)
       exit();
@@ -167,8 +164,8 @@ main(void)
         printf(2, "cannot cd %s\n", buf+3);
       continue;
     }
-    if(fork1() == 0){
-      runcmd(parsecmd(buf));}
+    if(fork1() == 0)
+      runcmd(parsecmd(buf));
     wait();
   }
   exit();

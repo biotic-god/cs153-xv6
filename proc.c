@@ -171,19 +171,19 @@ growproc(int n)
   sz = curproc->sz;
   if(curproc->tstack != 0)
    {
-	  if(sz +n >= curproc->tstack-PGSIZE)
+	  if(sz + n >= curproc->tstack-PGSIZE)
 		  return -1;
    }
-//	resetpteu(curproc->pgdir,(char *)sz);
+	resetpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
   if(n > 0){
     if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
-		if(sz+PGSIZE<=curproc->tstack) return -1;
+		if(sz+PGSIZE >= curproc->tstack) return -1;
   } else if(n < 0){
     if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
   }
-//	clearpteu(curproc->pgdir,(char *)sz);
+	clearpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
   curproc->sz = sz;
   switchuvm(curproc);
   return 0;
@@ -224,26 +224,74 @@ growstack(void)
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
+
 int
 fork(void)
 {
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
-	
+	int page_id;
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
   }
 
   // Copy process state from proc. Changed the copyuvm for CS 153 lab2 part 1
-  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz, curproc->tstack)) == 0){
+  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
     np->state = UNUSED;
     return -1;
   }
 	np->tstack = curproc->tstack;
+  np->sz = curproc->sz;
+  np->parent = curproc;
+  *np->tf = *curproc->tf;
+	for(page_id = 0; page_id < MAXPPP; page_id++){
+		np->pages[page_id].id = -1;
+		np->pages[page_id].vaddr = 0;
+	}
+  // Clear %eax so that fork returns 0 in the child.
+  np->tf->eax = 0;
+
+  for(i = 0; i < NOFILE; i++)
+    if(curproc->ofile[i])
+      np->ofile[i] = filedup(curproc->ofile[i]);
+  np->cwd = idup(curproc->cwd);
+
+  safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+
+  pid = np->pid;
+
+  acquire(&ptable.lock);
+
+  np->state = RUNNABLE;
+
+  release(&ptable.lock);
+  return pid;
+}
+
+/*
+int
+fork(void)
+{
+  int i, pid;
+  struct proc *np;
+  struct proc *curproc = myproc();
+
+  // Allocate process.
+  if((np = allocproc()) == 0){
+    return -1;
+  }
+
+  // Copy process state from proc.
+  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
+    kfree(np->kstack);
+    np->kstack = 0;
+    np->state = UNUSED;
+    return -1;
+  }
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
@@ -265,9 +313,10 @@ fork(void)
   np->state = RUNNABLE;
 
   release(&ptable.lock);
+
   return pid;
 }
-
+*/
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
@@ -277,7 +326,7 @@ exit(void)
   struct proc *curproc = myproc();
   struct proc *p;
   int fd;
-//	int page_id;
+	int page_id;
   if(curproc == initproc)
     panic("init exiting");
 
@@ -307,11 +356,11 @@ exit(void)
         wakeup1(initproc);
     }
   }
-	/*
+	
 	for(page_id = 0; page_id < MAXPPP; page_id++){
-		if(p->pages[page_id].id != -1) shm_close(p->pages[page_id].id);
+		if(curproc->pages[page_id].id != -1) shm_close(curproc->pages[page_id].id);
 	}
-*/
+
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
   sched();
