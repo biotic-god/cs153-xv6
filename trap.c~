@@ -89,7 +89,7 @@ trap(struct trapframe *tf)
 				uint rep = ((curproc->tstack - curproc->tf->esp)/PGSIZE)+1;
 				cprintf("rep: %d\n", rep);
 				if(curproc->sz+2*PGSIZE > curproc->tf->esp){ // Checks for the garbage so that if the esp reaches we delete until it is no longer there.
-					cprintf("guard page error! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
+					cprintf("guard page reached! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());
 					curproc->killed = 1;
 					break;
 				}
@@ -98,6 +98,8 @@ trap(struct trapframe *tf)
 					curproc->killed = 1;
 					break;
 				}
+				cprintf("current esp 0x%x\n",curproc->tf->esp);
+				cprintf("current tstack 0x%x\n",curproc->tstack);
 				break;
 			}
 		  cprintf("Access forbidden! esp 0x%x stack 0x%x sz 0x%x addr 0x%x\n", curproc->tf->esp, curproc->tstack, curproc->sz, rcr2());

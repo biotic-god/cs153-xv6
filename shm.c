@@ -21,7 +21,7 @@ void shminit() {
   initlock(&(shm_table.lock), "SHM lock");
   acquire(&(shm_table.lock));
   for (i = 0; i< 64; i++) {
-    shm_table.shm_pages[i].id =0;
+    shm_table.shm_pages[i].id = -1;
     shm_table.shm_pages[i].frame =0;
     shm_table.shm_pages[i].refcnt =0;
   }
@@ -110,7 +110,6 @@ int shm_open(int id, char **pointer) {
 
 
 int shm_close(int id) {
-	cprintf("****************");
 	int page_id;
 	pte_t *pte;
 	struct proc *curproc = myproc();
@@ -137,16 +136,16 @@ int shm_close(int id) {
 		release(&(shm_table.lock));
 		return 0;
 	}
-	if(shm_table.shm_pages[id].refcnt == 0){
-		shm_table.shm_pages[id].id =0;
+	if(shm_table.shm_pages[id].refcnt <= 0){
+		shm_table.shm_pages[id].id = -1;
 		if((*pte & PTE_P) == 0){
 			cprintf("Proc: %d, free memory error 2\n",curproc->pid);
-			shm_table.shm_pages[id].frame =0;
+			shm_table.shm_pages[id].frame = 0;
 			release(&(shm_table.lock));
 			return 0;
 		}
 		kfree(P2V(PTE_ADDR(*pte)));
-		shm_table.shm_pages[id].frame =0;
+		shm_table.shm_pages[id].frame = 0;
 	}
 	*pte = 0;
 	release(&(shm_table.lock));
