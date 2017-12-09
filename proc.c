@@ -174,7 +174,7 @@ growproc(int n)
 	  if(sz + n >= curproc->tstack-PGSIZE)
 		  return -1;
    }
-	resetpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
+//	resetpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
   if(n > 0){
     if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
@@ -183,7 +183,7 @@ growproc(int n)
     if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
   }
-	clearpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
+//	clearpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
   curproc->sz = sz;
   switchuvm(curproc);
   return 0;

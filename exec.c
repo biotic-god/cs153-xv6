@@ -61,7 +61,8 @@ exec(char *path, char **argv)
   ip = 0;
 
   sz = PGROUNDUP(sz);
-	clearpteu(pgdir, (char*)sz);
+//	cprintf("sz: %x\n", sz);
+//	clearpteu(pgdir, (char*)sz);
 /*
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
