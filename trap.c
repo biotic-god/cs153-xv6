@@ -110,7 +110,7 @@ trap(struct trapframe *tf)
 						 "eip 0x%x addr 0x%x--kill proc\n",
 						  curproc->pid, curproc->name, tf->trapno, tf->err, cpuid(), tf->eip, 
 						  rcr2());                                          
-			curproc->killed = 1;
+			panic("trap");
 			break;
     }
 

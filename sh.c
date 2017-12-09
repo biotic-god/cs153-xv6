@@ -63,10 +63,8 @@ runcmd(struct cmd *cmd)
   struct listcmd *lcmd;
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
-	printf(1, "cmd: %d\n", cmd);
   if(cmd == 0)
     exit();
-
   switch(cmd->type){
   default:
     panic("runcmd");
@@ -146,7 +144,6 @@ main(void)
 {
   static char buf[100];
   int fd;
-
   // Ensure that three file descriptors are open.
   while((fd = open("console", O_RDWR)) >= 0){
     if(fd >= 3){
@@ -154,7 +151,6 @@ main(void)
       break;
     }
   }
-
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
@@ -166,6 +162,7 @@ main(void)
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
+		
     wait();
   }
   exit();
@@ -329,7 +326,6 @@ parsecmd(char *s)
 {
   char *es;
   struct cmd *cmd;
-
   es = s + strlen(s);
   cmd = parseline(&s, es);
   peek(&s, es, "");
@@ -422,7 +418,6 @@ parseexec(char **ps, char *es)
 
   if(peek(ps, es, "("))
     return parseblock(ps, es);
-
   ret = execcmd();
   cmd = (struct execcmd*)ret;
 

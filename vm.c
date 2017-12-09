@@ -223,12 +223,10 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
 {
   char *mem;
   uint a;
-
   if(newsz > USEREND)
     return 0;
   if(newsz < oldsz)
     return oldsz;
-
   a = PGROUNDUP(oldsz);
   for(; a < newsz; a += PGSIZE){
     mem = kalloc();
@@ -440,6 +438,27 @@ addstackpage(pde_t *pgdir, uint tstack, uint rep)
   return 1;
 }
 
+int 
+removeshm(pde_t *pgdir, void *frame, int flag)
+{
+	pte_t *pte;
+	struct proc *curproc = myproc();
+	pte = walkpgdir(pgdir, frame, 0);
+	if(pte == 0){
+		cprintf("Proc: %d, pte nonexist error\n",curproc->pid);
+		return -1;
+	}
+	if(flag){
+		if((*pte & PTE_P) == 0 || PTE_ADDR(*pte) == 0){
+			cprintf("Proc: %d, free memory error\n",curproc->pid);
+			return -1;
+		}
+		char *va = P2V(PTE_ADDR(*pte));
+		kfree(va);
+	}
+	*pte = 0;
+	return 0;
+}
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

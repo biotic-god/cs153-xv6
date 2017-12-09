@@ -111,7 +111,7 @@ int shm_open(int id, char **pointer) {
 
 int shm_close(int id) {
 	int page_id;
-	pte_t *pte;
+	int flag = 0;
 	struct proc *curproc = myproc();
 	if(id < 0 || id >= 64){
 		cprintf("Proc: %d, invalid id\n",curproc->pid);
@@ -127,29 +127,27 @@ int shm_close(int id) {
 	if(shm_table.shm_pages[id].refcnt <= 0){
 		release(&(shm_table.lock));
 		cprintf("Proc: %d, empty entry in table\n",curproc->pid);
-		return 0;
+		return -1;
 	}
 	shm_table.shm_pages[id].refcnt--;
-	pte = walkpgdir(curproc->pgdir, shm_table.shm_pages[id].frame, 0);
-	if(pte == 0){
-		cprintf("Proc: %d, free memory error 1\n",curproc->pid);
+  if(curproc->pgdir == 0) {
+		cprintf("Proc: %d, pgdir nonexist error\n",curproc->pid);
 		release(&(shm_table.lock));
-		return 0;
+		return -1;
 	}
 	if(shm_table.shm_pages[id].refcnt <= 0){
+		flag = 1;
 		shm_table.shm_pages[id].id = -1;
-		if((*pte & PTE_P) == 0){
-			cprintf("Proc: %d, free memory error 2\n",curproc->pid);
-			shm_table.shm_pages[id].frame = 0;
-			release(&(shm_table.lock));
-			return 0;
-		}
-		kfree(P2V(PTE_ADDR(*pte)));
-		shm_table.shm_pages[id].frame = 0;
 	}
-	*pte = 0;
+	if(removeshm(curproc->pgdir, shm_table.shm_pages[id].frame, flag) < 0){
+		shm_table.shm_pages[id].frame = 0;
+		cprintf("Proc: %d, remove page error\n",curproc->pid);
+		release(&(shm_table.lock));
+		return -1;
+	}
+	shm_table.shm_pages[id].frame = 0;
 	release(&(shm_table.lock));
 	curproc->pages[page_id].id = -1;
 	curproc->pages[page_id].vaddr = 0;
-	return 0;
+	return 1;
 }

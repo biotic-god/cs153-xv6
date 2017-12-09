@@ -20,7 +20,6 @@ exec(char *path, char **argv)
   struct proc *curproc = myproc();
   uint tstack = 0; //top of stack For CS153 lab2 part1
   begin_op();
-
   if((ip = namei(path)) == 0){
     end_op();
     cprintf("exec: fail\n");

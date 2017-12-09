@@ -169,12 +169,13 @@ growproc(int n)
   uint sz;
   struct proc *curproc = myproc();
   sz = curproc->sz;
+	cprintf("%d***********", n);
   if(curproc->tstack != 0)
    {
 	  if(sz + n >= curproc->tstack-PGSIZE)
 		  return -1;
    }
-	resetpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
+//	resetpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
   if(n > 0){
     if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
@@ -183,7 +184,7 @@ growproc(int n)
     if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
   }
-	clearpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
+//	clearpteu(curproc->pgdir,(char *)PGROUNDUP(sz));
   curproc->sz = sz;
   switchuvm(curproc);
   return 0;
@@ -254,7 +255,6 @@ fork(void)
 	}
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
-
   for(i = 0; i < NOFILE; i++)
     if(curproc->ofile[i])
       np->ofile[i] = filedup(curproc->ofile[i]);

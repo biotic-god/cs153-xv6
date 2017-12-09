@@ -643,6 +643,7 @@ namex(char *path, int nameiparent, char *name)
       return ip;
     }
     if((next = dirlookup(ip, name, 0)) == 0){
+			cprintf("******%s\n", path);
       iunlockput(ip);
       return 0;
     }

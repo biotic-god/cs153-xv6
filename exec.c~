@@ -20,7 +20,7 @@ exec(char *path, char **argv)
   struct proc *curproc = myproc();
   uint tstack = 0; //top of stack For CS153 lab2 part1
   begin_op();
-
+	cprintf("%s\n", path);
   if((ip = namei(path)) == 0){
     end_op();
     cprintf("exec: fail\n");
@@ -61,7 +61,7 @@ exec(char *path, char **argv)
   ip = 0;
 
   sz = PGROUNDUP(sz);
-	cprintf("sz: %x\n", sz);
+//	cprintf("sz: %x\n", sz);
 //	clearpteu(pgdir, (char*)sz);
 /*
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
